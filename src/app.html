@@ -187,6 +187,17 @@
 				Footer content
 			</span> -->
 		</div>
+
+		<!-- token-url is set in +layout.svelte from WEBUI_API_BASE_URL: in dev the
+		     backend is on another port, in production it is same-origin, and only
+		     that constant knows the difference.
+
+		     This script src is NOT parametrized the same way: app.html is static
+		     markup with no access to build-time constants, so it hardcodes the
+		     dev agent-manager port. Point this at wherever your agent-manager
+		     serves widget.js before deploying anywhere but localhost. -->
+		<script type="module" src="http://localhost:8100/widget.js"></script>
+		<agent-chat title="Assistant"></agent-chat>
 	</body>
 
 	<style type="text/css" nonce="">

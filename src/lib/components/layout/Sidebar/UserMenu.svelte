@@ -574,6 +574,11 @@
 					user.set(null);
 					localStorage.removeItem('token');
 
+					// Drop the assistant's cached identity now, not whenever its
+					// token happens to expire — the next visitor to this browser
+					// should not inherit this session's chat.
+					document.querySelector('agent-chat')?.logout();
+
 					location.href = res?.redirect_url ?? '/auth';
 					show = false;
 				}}

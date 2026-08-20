@@ -852,6 +852,9 @@
 		localStorage.removeItem('token');
 		// Clear the OAuth token cookie so /auth doesn't auto-login and redirect-loop
 		document.cookie = 'token=; Max-Age=0; path=/';
+		// No page reload follows this path, so the assistant widget would
+		// otherwise keep the cached identity from the session that just expired.
+		document.querySelector('agent-chat')?.logout();
 		userSignOut().catch((error) => {
 			console.error('Error signing out expired session:', error);
 		});
@@ -990,6 +993,14 @@
 	};
 
 	onMount(async () => {
+		// The assistant widget lives in app.html, which cannot import this
+		// constant. A relative URL would resolve against the page — correct in
+		// production, but wrong in dev where the backend is on another port.
+		// `token-url` is an observed attribute, so setting it re-resolves identity.
+		document
+			.querySelector('agent-chat')
+			?.setAttribute('token-url', `${WEBUI_API_BASE_URL}/auths/agent-chat/token`);
+
 		const originalFetch = window.fetch.bind(window);
 		window.fetch = async (input, init) => {
 			const response = await originalFetch(input, init);

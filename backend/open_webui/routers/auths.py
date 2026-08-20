@@ -243,6 +243,16 @@ class SessionUserInfoResponse(SessionUserResponse, UserStatus):
     date_of_birth: datetime.date | None = None
 
 
+@router.get('/agent-chat/token')
+async def get_agent_chat_token(user=Depends(get_current_user)):
+    # Short-lived and independent of the session's own jti: this token cannot
+    # be revoked by Open WebUI's own sign-out (that only invalidates the
+    # original session's jti), so a short TTL is what bounds how long a
+    # logged-out user's chat identity keeps working.
+    token = create_token(data={'id': user.id}, expires_delta=datetime.timedelta(minutes=5))
+    return {'token': token}
+
+
 @router.get('/', response_model=SessionUserInfoResponse)
 async def get_session_user(
     request: Request,
