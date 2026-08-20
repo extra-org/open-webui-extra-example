@@ -7,6 +7,18 @@ defaults:
     name: claude-haiku-4-5
     temperature: 0.0
 
+plugins:
+  import_roots:
+    - "."
+
+hooks:
+  on_run_start:
+    - plugin: "run_token"
+      method: "on_run_start"
+      # No run without a fresh credential — a run that continued here would
+      # act with no identity at all.
+      failure_policy: fail
+
 tools:
   add_new_user:
     description: Adding new user to the system

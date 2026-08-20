@@ -21,7 +21,7 @@ tools = "plugins.tools"
 [hooks]
 on_engine_start = []
 on_engine_stop = []
-on_run_start = []
+on_run_start = ["run_token"]
 on_run_end = []
 on_run_error = []
 before_tool_call = []
@@ -32,6 +32,7 @@ before_mcp_request = []
 after_mcp_response = []
 
 [hooks.plugins]
+run_token = "plugins.hooks.run_token:RunTokenHook"
 
 [resolvers]
 
