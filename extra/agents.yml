@@ -46,6 +46,9 @@ orchestrators:
     prompts:
       orchestrator: "prompts/admin_management/orchestrator.md"
       system: "prompts/admin_management/system.md"
+    # Hidden from routing entirely unless plugins/access.py says otherwise —
+    # not just refused after the model reaches for it. See plugins/access.py.
+    protected: true
 
 agents:
   user_management:
