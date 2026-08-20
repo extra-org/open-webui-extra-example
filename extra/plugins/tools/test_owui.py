@@ -1,13 +1,17 @@
-"""Self-check: error paths surface the real reason, not a generic string.
+"""Self-check: calls go out as the caller, and error paths surface the real
+reason rather than a generic string.
 
 Run: python -m plugins.tools.test_owui
 """
 
 import requests
+from agent_engine.runtime.hooks import AuthContext, RunContext, current_run_context
 
 from plugins.tools import _owui
 from plugins.tools.add_new_user import add_new_user
 from plugins.tools.all_user_details import all_user_details
+
+CALLER = RunContext(auth_context=AuthContext(inbound_access_token="caller-token"))
 
 
 class FakeResponse:
@@ -31,9 +35,23 @@ def _patch(fn):
 def main():
     original = requests.request
 
+    # No credential: refused before the wire, not just in the message.
+    sent = []
+    _patch(lambda *a, **k: sent.append(a) or FakeResponse(200, {}))
+    err = add_new_user("Dana", "dana@example.com", "pw")["error"]
+    assert "not sent" in err and "could not be performed" in err, err
+    assert sent == [], "a request went out with no credential"
+
+    token = current_run_context.set(CALLER)
+
+    # The caller's own credential authenticates the call.
+    _patch(lambda *a, **k: sent.append(k["headers"]["Authorization"]) or FakeResponse(200, {}))
+    all_user_details()
+    assert sent == ["Bearer caller-token"], sent
+
     _patch(lambda *a, **k: FakeResponse(403, {"detail": "Not authorized"}))
     err = add_new_user("Dana", "dana@example.com", "pw")["error"]
-    assert "403" in err and "Not authorized" in err and "permission" in err, err
+    assert "403" in err and "Not authorized" in err and "not allowed" in err, err
 
     _patch(lambda *a, **k: FakeResponse(400, None, text="bad email format"))
     err = add_new_user("Dana", "not-an-email", "pw")["error"]
@@ -68,6 +86,7 @@ def main():
          "role": "admin", "name": "amit", "group_ids": ["9f21"]}
     ], result
 
+    current_run_context.reset(token)
     _owui.requests.request = original
     print("ok")
 
