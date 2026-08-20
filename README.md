@@ -25,10 +25,9 @@ sh dev.sh
 
 Frontend at `http://localhost:5173`, backend at `http://localhost:8080`.
 
-**Extra** — from a clone of [extra-org/extra](https://github.com/extra-org/extra):
+**Extra** — set up `extra/.env` per the Environment section below, then from a clone of [extra-org/extra](https://github.com/extra-org/extra):
 
 ```bash
-cp extra/.env.example extra/.env   # fill in the keys — see Environment below
 make dev AGENTS=<path-to-this-repo>/extra/agents.yml ENV_FILE=<path-to-this-repo>/extra/.env
 ```
 
@@ -46,11 +45,29 @@ Playground at `http://localhost:8100/playground`. Sign into Open WebUI and the a
 
 ## Environment
 
-`extra/.env`, for the dev setup above (`extra/.env.example` already has all of this filled in except the model key):
+```bash
+cp extra/.env.example extra/.env
+```
+
+Everything below is already filled in except the model key — open `extra/.env` and add that, and you're running:
+
+```bash
+ANTHROPIC_API_KEY=your-key-here   # or see the Ollama comment for a free local model instead
+
+OPEN_WEBUI_URL=http://localhost:8080
+
+AGENT_AUTH_MODE=host_token
+AGENT_AUTH_SECRET=pLiUxoi+ziwTUIhNhVg/AN1U50UMom00
+AGENT_AUTH_CLAIM_USER_ID=id
+
+CORS_ORIGINS=http://localhost:5173
+```
+
+What each of these is, and why it has to be that exact value:
 
 | Key | Value | Why |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | your key — or skip it and use a free local [Ollama](https://ollama.com) model instead, see the comments in `.env.example` and `agents.yml` | the model the agents run on |
+| `ANTHROPIC_API_KEY` | your key | the model the agents run on — skip it and use [Ollama](https://ollama.com) for free instead, see the comment above |
 | `OPEN_WEBUI_URL` | `http://localhost:8080` | the backend, where tool calls actually land |
 | `AGENT_AUTH_SECRET` | `pLiUxoi+ziwTUIhNhVg/AN1U50UMom00` — same fixed value as `backend/.env.example`'s `WEBUI_SECRET_KEY` | Extra verifies Open WebUI's session JWT itself; HMAC means one shared secret signs and verifies on both sides |
 | `AGENT_AUTH_MODE` | `host_token` | verify that JWT directly, no separate token-minting step |
