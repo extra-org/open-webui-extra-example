@@ -249,7 +249,13 @@ async def get_agent_chat_token(user=Depends(get_current_user)):
     # be revoked by Open WebUI's own sign-out (that only invalidates the
     # original session's jti), so a short TTL is what bounds how long a
     # logged-out user's chat identity keeps working.
-    token = create_token(data={'id': user.id}, expires_delta=datetime.timedelta(minutes=5))
+    #
+    # role rides along too: it's what lets Extra's access plugin decide which
+    # protected agents to even offer, without a second round trip back here to
+    # ask "is this user an admin?" on every routing decision.
+    token = create_token(
+        data={'id': user.id, 'role': user.role}, expires_delta=datetime.timedelta(minutes=5)
+    )
     return {'token': token}
 
 
