@@ -17,7 +17,7 @@ npm run dev
 ```bash
 # terminal 2 — backend
 cd backend
-echo "WEBUI_SECRET_KEY=$(openssl rand -base64 24)" > .env   # dev.sh needs one; unlike start.sh it won't generate it
+cp .env.example .env   # dev.sh needs WEBUI_SECRET_KEY set; unlike start.sh it won't generate one
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt -U
 sh dev.sh
@@ -46,21 +46,27 @@ Playground at `http://localhost:8100/playground`. Sign into Open WebUI and the a
 
 ## Environment
 
-`extra/.env`, for the dev setup above:
+`extra/.env`, for the dev setup above (`extra/.env.example` already has all of this filled in except the model key):
 
 | Key | Value | Why |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | your key | the model the agents run on |
+| `ANTHROPIC_API_KEY` | your key — or skip it and use a free local [Ollama](https://ollama.com) model instead, see the comments in `.env.example` and `agents.yml` | the model the agents run on |
 | `OPEN_WEBUI_URL` | `http://localhost:8080` | the backend, where tool calls actually land |
-| `AGENT_AUTH_SECRET` | the same value as `backend/.env`'s `WEBUI_SECRET_KEY` | Extra verifies Open WebUI's session JWT itself — same secret, both sides |
+| `AGENT_AUTH_SECRET` | `pLiUxoi+ziwTUIhNhVg/AN1U50UMom00` — same fixed value as `backend/.env.example`'s `WEBUI_SECRET_KEY` | Extra verifies Open WebUI's session JWT itself; HMAC means one shared secret signs and verifies on both sides |
 | `AGENT_AUTH_MODE` | `host_token` | verify that JWT directly, no separate token-minting step |
 | `AGENT_AUTH_CLAIM_USER_ID` | `id` | Open WebUI's token carries the user id under `id`, not the usual `sub` |
 | `CORS_ORIGINS` | `http://localhost:5173` | where the browser loads the page from, not where the backend answers — the two are different ports in dev |
 
-Get these wrong and the failure is specific enough to point back here: a
-mismatched `AGENT_AUTH_SECRET` fails every request with a signature error, a
-wrong `CORS_ORIGINS` shows up as a browser console error before any request
-lands at all.
+`AGENT_AUTH_SECRET`/`WEBUI_SECRET_KEY` is a fixed, publicly-known dev value —
+the same one ships in both `.env.example` files, on purpose. That's fine only
+because this all runs on your machine with no real users and nothing else
+trusts it; change both together to something private (`openssl rand -base64
+24`) the moment this runs anywhere else reachable.
+
+Get the rest wrong and the failure points back here: a mismatched
+`AGENT_AUTH_SECRET` fails every request with a signature error, a wrong
+`CORS_ORIGINS` shows up as a browser console error before any request lands
+at all.
 
 ## What's in `extra/`
 

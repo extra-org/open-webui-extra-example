@@ -1,6 +1,10 @@
 system:
   name: "Open web UI"
 
+# Switch provider here and set the matching key in .env — nothing else in
+# this file names a vendor. For a local Ollama model instead of a paid key,
+# use provider: openai, name: qwen2.5:14b (or whatever you've pulled), and
+# see the Ollama comment in .env.example.
 defaults:
   model:
     provider: anthropic
