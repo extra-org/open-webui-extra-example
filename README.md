@@ -2,8 +2,6 @@
 
 This is [Open WebUI](https://github.com/open-webui/open-webui) with an [Extra](https://github.com/extra-org/extra) assistant embedded in it, wired to act as whoever is signed in rather than through one shared admin key. Everything Extra-specific lives in [`extra/`](extra/); the rest is upstream Open WebUI ([its own README](README.upstream.md)).
 
-> Needs [extra-org/extra#112](https://github.com/extra-org/extra/pull/112) merged — until then, tool calls fail closed with "no credential."
-
 ## Run it
 
 **Open WebUI** — two terminals, per the [official dev guide](https://docs.openwebui.com/getting-started/advanced-topics/development):
