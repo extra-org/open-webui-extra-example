@@ -1,0 +1,52 @@
+system:
+  name: "Open web UI"
+
+defaults:
+  model:
+    provider: anthropic
+    name: claude-haiku-4-5
+    temperature: 0.0
+
+tools:
+  add_new_user:
+    description: Adding new user to the system
+  all_user_details:
+    description: Get list of all users details
+  delete_specific_user:
+    description: Delete specific user
+  list_of_groups:
+    description: List of all groups
+  create_group:
+    description: Creating new group
+  add_user_to_group:
+    description: add specific user to group
+
+orchestrators:
+  openwebui:
+    prompts:
+      orchestrator: "prompts/openwebui_orchestrator/orchestrator.md"
+      system: "prompts/openwebui_orchestrator/system.md"
+  admin_management:
+    prompts:
+      orchestrator: "prompts/admin_management/orchestrator.md"
+      system: "prompts/admin_management/system.md"
+
+agents:
+  user_management:
+    description: Handling user management operations and details
+    prompts:
+      system: "prompts/user_management/system.md"
+    tools: [add_new_user, all_user_details, delete_specific_user]
+    auto: true
+  group_management:
+    description: Group management [user is user id not name and uuid]
+    prompts:
+      system: "prompts/group_management/system.md"
+    tools: [list_of_groups, create_group, add_user_to_group]
+    auto: true
+
+graph:
+  openwebui:
+    admin_management:
+      user_management:
+      group_management:
