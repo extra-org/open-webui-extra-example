@@ -12,7 +12,9 @@ Open WebUI's /agent-chat/token endpoint now sends `role`, matched by this
 deployment's AGENT_AUTH_CLAIM_ROLES=role (.env.example).
 """
 
+from plugins._identity import is_admin
+
 
 class AccessResolver:
     def can_access(self, ctx: dict, node_id: str) -> bool:
-        return "admin" in ctx.get("auth", {}).get("roles", ())
+        return is_admin(ctx.get("auth", {}).get("roles", ()))

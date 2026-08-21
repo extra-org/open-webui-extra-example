@@ -89,8 +89,13 @@ at all.
 
 ## What's in `extra/`
 
-A sequence of commits, each a step in the same story: a naive assistant sharing one admin API key between every user, then made to act as the caller instead, then made to survive runs longer than a session token's lifetime, then made to hide the whole admin path from anyone who isn't actually an Open WebUI admin. Read them in order — `git log extra/` — to see why each change was needed, not just what it does.
+A sequence of commits, each a step in the same story: a naive assistant sharing one admin API key between every user, then made to act as the caller instead, then made to survive runs longer than a session token's lifetime, then made to hide the whole admin path from anyone who isn't actually an Open WebUI admin, and finally made to stop *describing* that path to people who cannot use it. Read them in order — `git log extra/` — to see why each change was needed, not just what it does.
 
-That last step uses `protected: true` (`agents.yml`) plus `plugins/access.py` — a node marked `protected` is invisible to the router, not just refused, unless the access plugin allows it. It's a general engine feature, not specific to this example; see [`extra-org/extra`'s docs](https://github.com/extra-org/extra/blob/main/docs/YAML_SPEC.md#access-control) for the full contract.
+Those last two are the pair worth studying together, because either alone leaves the assistant inconsistent:
+
+- **`protected: true`** (`agents.yml`) plus **`plugins/access.py`** decides what the router can *reach*. A node marked `protected` is invisible to the router, not just refused, unless the access plugin allows it.
+- **`{{admin_routing}}`** in the router's prompt, filled by **`plugins/resolvers/openwebui.py`**, decides what the router is *told exists*. Without it the prompt named a destination a non-admin would never be offered, so the assistant announced admin help it could not deliver.
+
+Both are general engine features, not specific to this example — see [access control](https://github.com/extra-org/extra/blob/main/docs/YAML_SPEC.md#access-control) and [resolvers](https://github.com/extra-org/extra/blob/main/docs/YAML_SPEC.md#resolvers-vs-tools). Both read the caller's role, and `plugins/_identity.py` is the one place that decides what "admin" means so the two can never drift apart.
 
 `backend/open_webui/routers/auths.py` and the four files under `src/` are the Open WebUI side of the wiring: one endpoint that mints a short-lived token for the signed-in user — carrying their role, which is what the access plugin checks — and the widget embed that calls it.

@@ -23,6 +23,12 @@ hooks:
       # act with no identity at all.
       failure_policy: fail
 
+resolvers:
+  # Fills {{admin_routing}} in the root orchestrator's prompt — see
+  # plugins/resolvers/openwebui.py.
+  admin_routing:
+    scope: agent
+
 tools:
   add_new_user:
     description: Adding new user to the system
@@ -39,6 +45,7 @@ tools:
 
 orchestrators:
   openwebui:
+    resolvers: [admin_routing]
     prompts:
       orchestrator: "prompts/openwebui_orchestrator/orchestrator.md"
       system: "prompts/openwebui_orchestrator/system.md"

@@ -35,6 +35,7 @@ after_mcp_response = []
 run_token = "plugins.hooks.run_token:RunTokenHook"
 
 [resolvers]
+openwebui = "plugins.resolvers.openwebui:Resolver"
 
 [tools]
 add_new_user = "plugins.tools.add_new_user:add_new_user"
