@@ -56,7 +56,7 @@ ANTHROPIC_API_KEY=your-key-here   # or see the Ollama comment for a free local m
 
 OPEN_WEBUI_URL=http://localhost:8080
 
-AGENT_AUTH_MODE=host_token
+AGENT_AUTH_MODE=mint
 AGENT_AUTH_SECRET=pLiUxoi+ziwTUIhNhVg/AN1U50UMom00
 AGENT_AUTH_CLAIM_USER_ID=id
 AGENT_AUTH_CLAIM_ROLES=role
@@ -71,7 +71,7 @@ What each of these is, and why it has to be that exact value:
 | `ANTHROPIC_API_KEY` | your key | the model the agents run on — skip it and use [Ollama](https://ollama.com) for free instead, see the comment above |
 | `OPEN_WEBUI_URL` | `http://localhost:8080` | the backend, where tool calls actually land |
 | `AGENT_AUTH_SECRET` | `pLiUxoi+ziwTUIhNhVg/AN1U50UMom00` — same fixed value as `backend/.env.example`'s `WEBUI_SECRET_KEY` | Extra verifies Open WebUI's session JWT itself; HMAC means one shared secret signs and verifies on both sides |
-| `AGENT_AUTH_MODE` | `host_token` | verify that JWT directly, no separate token-minting step |
+| `AGENT_AUTH_MODE` | `mint` | `token-url` points at Open WebUI's dedicated `/auths/agent-chat/token`, not the user's regular session — `mint` is for exactly that: a short-lived token minted specifically for us, with its lifetime capped (`AGENT_AUTH_MAX_TTL_SECONDS`, 1h default) rather than trusted at whatever the token claims |
 | `AGENT_AUTH_CLAIM_USER_ID` | `id` | Open WebUI's token carries the user id under `id`, not the usual `sub` |
 | `AGENT_AUTH_CLAIM_ROLES` | `role` | which claim `plugins/access.py` reads to decide who can reach the protected `admin_management` node |
 | `CORS_ORIGINS` | `http://localhost:5173` | where the browser loads the page from, not where the backend answers — the two are different ports in dev |
